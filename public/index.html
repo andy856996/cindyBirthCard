@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Cindy's Birthday App</title>
-  
+
   <!-- iOS PWA Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Cindy's Card">
   <meta name="theme-color" content="#0d0f17">
   <meta name="format-detection" content="telephone=no">
-  
+
   <!-- Icons & Manifest -->
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/icon-512.png">
@@ -20,13 +22,17 @@
   <!-- Google Fonts for High-End Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
 
   <style>
     /* -------------------------------------------------------------
        1. Global Reset & iOS Safe Area Tokens
        ------------------------------------------------------------- */
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -50,7 +56,8 @@
       --safe-bottom: env(safe-area-inset-bottom, 20px);
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
       overflow-x: hidden;
@@ -82,6 +89,7 @@
       opacity: 0.45;
       animation: floatGlow 12s ease-in-out infinite alternate;
     }
+
     .ambient-glow-1 {
       width: 320px;
       height: 320px;
@@ -89,6 +97,7 @@
       top: -60px;
       left: -60px;
     }
+
     .ambient-glow-2 {
       width: 300px;
       height: 300px;
@@ -99,8 +108,13 @@
     }
 
     @keyframes floatGlow {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(25px, 35px) scale(1.15); }
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      100% {
+        transform: translate(25px, 35px) scale(1.15);
+      }
     }
 
     /* Canvas for Confetti */
@@ -270,8 +284,15 @@
     }
 
     @keyframes bounceArrow {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(8px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(8px);
+      }
     }
 
     .dev-bypass-btn {
@@ -285,6 +306,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
+
     .dev-bypass-btn:hover {
       color: #fff;
       border-color: rgba(255, 255, 255, 0.6);
@@ -422,9 +444,21 @@
     }
 
     @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-8px); }
-      40%, 80% { transform: translateX(8px); }
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20%,
+      60% {
+        transform: translateX(-8px);
+      }
+
+      40%,
+      80% {
+        transform: translateX(8px);
+      }
     }
 
     /* -------------------------------------------------------------
@@ -460,35 +494,53 @@
     }
 
     @keyframes catBob {
-      0% { transform: translateY(0px) rotate(0deg); }
-      100% { transform: translateY(-7px) rotate(-1deg); }
+      0% {
+        transform: translateY(0px) rotate(0deg);
+      }
+
+      100% {
+        transform: translateY(-7px) rotate(-1deg);
+      }
     }
 
     .cat-leg-fl {
       transform-origin: 55px 65px;
       animation: legRunFront 0.35s ease-in-out infinite alternate;
     }
+
     .cat-leg-fr {
       transform-origin: 65px 65px;
       animation: legRunBack 0.35s ease-in-out infinite alternate;
     }
+
     .cat-leg-bl {
       transform-origin: 125px 60px;
       animation: legRunBack 0.35s ease-in-out infinite alternate;
     }
+
     .cat-leg-br {
       transform-origin: 135px 60px;
       animation: legRunFront 0.35s ease-in-out infinite alternate;
     }
 
     @keyframes legRunFront {
-      0% { transform: rotate(32deg); }
-      100% { transform: rotate(-32deg); }
+      0% {
+        transform: rotate(32deg);
+      }
+
+      100% {
+        transform: rotate(-32deg);
+      }
     }
 
     @keyframes legRunBack {
-      0% { transform: rotate(-32deg); }
-      100% { transform: rotate(32deg); }
+      0% {
+        transform: rotate(-32deg);
+      }
+
+      100% {
+        transform: rotate(32deg);
+      }
     }
 
     .cat-tail {
@@ -497,8 +549,13 @@
     }
 
     @keyframes tailWhip {
-      0% { transform: rotate(-15deg); }
-      100% { transform: rotate(20deg); }
+      0% {
+        transform: rotate(-15deg);
+      }
+
+      100% {
+        transform: rotate(20deg);
+      }
     }
 
     /* Running Ground & Dust Trails */
@@ -527,13 +584,40 @@
       animation: dustFly 0.5s linear infinite;
     }
 
-    .dust-1 { width: 8px; height: 8px; bottom: 2px; left: 10px; animation-delay: 0s; }
-    .dust-2 { width: 6px; height: 6px; bottom: 8px; left: 18px; animation-delay: 0.18s; }
-    .dust-3 { width: 10px; height: 10px; bottom: 4px; left: 4px; animation-delay: 0.32s; }
+    .dust-1 {
+      width: 8px;
+      height: 8px;
+      bottom: 2px;
+      left: 10px;
+      animation-delay: 0s;
+    }
+
+    .dust-2 {
+      width: 6px;
+      height: 6px;
+      bottom: 8px;
+      left: 18px;
+      animation-delay: 0.18s;
+    }
+
+    .dust-3 {
+      width: 10px;
+      height: 10px;
+      bottom: 4px;
+      left: 4px;
+      animation-delay: 0.32s;
+    }
 
     @keyframes dustFly {
-      0% { transform: translate(0, 0) scale(1); opacity: 0.8; }
-      100% { transform: translate(-28px, -12px) scale(0.2); opacity: 0; }
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: translate(-28px, -12px) scale(0.2);
+        opacity: 0;
+      }
     }
 
     /* Loading Text & Progress Bar */
@@ -624,6 +708,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
+
     .icon-ctrl-btn:active {
       transform: scale(0.92);
       background: rgba(255, 255, 255, 0.2);
@@ -645,8 +730,15 @@
     }
 
     @keyframes cardPopIn {
-      0% { transform: scale(0.92) translateY(20px); opacity: 0; }
-      100% { transform: scale(1) translateY(0); opacity: 1; }
+      0% {
+        transform: scale(0.92) translateY(20px);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
     }
 
     /* Decorative Crown Stamp */
@@ -724,12 +816,16 @@
 
     /* Responsive adjustments */
     @media (max-height: 680px) {
-      .guide-card, .login-card, .birthday-main-card {
+
+      .guide-card,
+      .login-card,
+      .birthday-main-card {
         padding: 24px 18px;
       }
     }
   </style>
 </head>
+
 <body>
   <!-- Ambient Backdrops -->
   <div class="ambient-glow ambient-glow-1"></div>
@@ -748,9 +844,9 @@
         <div class="ios-badge">
           <span></span> iOS 原生模式體驗
         </div>
-        
+
         <img src="/icon-512.png" alt="App Icon" class="guide-icon-preview">
-        
+
         <h1 class="guide-title">專屬賀卡 App 已就緒</h1>
         <p class="guide-desc">
           為提供如 iOS 原生 App 般的專屬儀式感，本賀卡需以<strong>「獨立 App 模式」</strong>啟動以解鎖神秘內容。
@@ -761,10 +857,12 @@
             <div class="step-num">1</div>
             <div class="step-text">
               請點擊 Safari 底部工具列的 <span class="step-highlight">
-                <svg class="share-icon-svg" style="width:16px;height:16px;display:inline-block;vertical-align:middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                  <polyline points="16 6 12 2 8 6"/>
-                  <line x1="12" y1="2" x2="12" y2="15"/>
+                <svg class="share-icon-svg" style="width:16px;height:16px;display:inline-block;vertical-align:middle;"
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                  <polyline points="16 6 12 2 8 6" />
+                  <line x1="12" y1="2" x2="12" y2="15" />
                 </svg> 分享
               </span> 圖示
             </div>
@@ -785,20 +883,20 @@
           </div>
         </div>
 
-        <button id="dev-bypass-btn" class="dev-bypass-btn">
-          💻 開發者／電腦瀏覽器預覽模式 (點此直接測試)
-        </button>
+
       </div>
 
       <!-- Bouncing Arrow pointing to iPhone Safari Bottom Bar -->
       <div class="safari-bottom-indicator">
-        <svg class="share-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-          <polyline points="16 6 12 2 8 6"/>
-          <line x1="12" y1="2" x2="12" y2="15"/>
+        <svg class="share-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+          <polyline points="16 6 12 2 8 6" />
+          <line x1="12" y1="2" x2="12" y2="15" />
         </svg>
         <span>點擊下方 Safari 分享按鈕</span>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <polyline points="19 12 12 19 5 12"></polyline>
         </svg>
@@ -818,19 +916,13 @@
         <p class="login-subtitle">請輸入專屬通關密語開啟驚喜</p>
 
         <form id="login-form" class="pin-input-group" onsubmit="return false;">
-          <input
-            type="password"
-            id="password-input"
-            class="pin-input"
-            placeholder="請輸入密碼"
-            maxlength="12"
-            autocomplete="off"
-            inputmode="numeric"
-          />
+          <input type="password" id="password-input" class="pin-input" placeholder="請輸入密碼" maxlength="12"
+            autocomplete="off" inputmode="numeric" />
 
           <button type="submit" id="submit-btn" class="login-btn">
             <span>解鎖賀卡</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
@@ -851,66 +943,66 @@
           <svg class="running-cat-svg" viewBox="0 0 180 110" fill="none" xmlns="http://www.w3.org/2000/svg">
             <!-- Cat Back Legs (Behind Body) -->
             <g class="cat-leg-bl">
-              <path d="M125 58 Q135 78 140 88 Q136 92 130 90 Q120 78 116 62 Z" fill="#E67E42"/>
-              <ellipse cx="135" cy="89" rx="5" ry="3" fill="#FFE5D9"/>
+              <path d="M125 58 Q135 78 140 88 Q136 92 130 90 Q120 78 116 62 Z" fill="#E67E42" />
+              <ellipse cx="135" cy="89" rx="5" ry="3" fill="#FFE5D9" />
             </g>
             <g class="cat-leg-fl">
-              <path d="M55 58 Q45 76 38 86 Q43 90 48 88 Q58 76 64 60 Z" fill="#E67E42"/>
-              <ellipse cx="42" cy="88" rx="5" ry="3" fill="#FFE5D9"/>
+              <path d="M55 58 Q45 76 38 86 Q43 90 48 88 Q58 76 64 60 Z" fill="#E67E42" />
+              <ellipse cx="42" cy="88" rx="5" ry="3" fill="#FFE5D9" />
             </g>
 
             <!-- Tail -->
             <g class="cat-tail">
-              <path d="M136 48 C155 45 168 32 165 20 C162 14 154 16 156 24 C158 32 148 40 134 44 Z" fill="#F48C42"/>
+              <path d="M136 48 C155 45 168 32 165 20 C162 14 154 16 156 24 C158 32 148 40 134 44 Z" fill="#F48C42" />
               <!-- Tail Tip Sparkle / White patch -->
-              <circle cx="164" cy="20" r="3.5" fill="#FFF"/>
+              <circle cx="164" cy="20" r="3.5" fill="#FFF" />
             </g>
 
             <!-- Cat Main Torso -->
-            <ellipse cx="94" cy="54" rx="42" ry="24" fill="#F48C42"/>
+            <ellipse cx="94" cy="54" rx="42" ry="24" fill="#F48C42" />
             <!-- Cute Belly White Patch -->
-            <path d="M72 62 C82 72 108 72 118 62 C108 68 82 68 72 62 Z" fill="#FFE5D9"/>
+            <path d="M72 62 C82 72 108 72 118 62 C108 68 82 68 72 62 Z" fill="#FFE5D9" />
             <!-- Orange Striping Accent -->
-            <path d="M84 36 Q88 44 82 48" stroke="#D35400" stroke-width="2.5" stroke-linecap="round"/>
-            <path d="M96 34 Q100 44 94 48" stroke="#D35400" stroke-width="2.5" stroke-linecap="round"/>
-            <path d="M108 36 Q112 44 106 48" stroke="#D35400" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M84 36 Q88 44 82 48" stroke="#D35400" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M96 34 Q100 44 94 48" stroke="#D35400" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M108 36 Q112 44 106 48" stroke="#D35400" stroke-width="2.5" stroke-linecap="round" />
 
             <!-- Cat Front Legs (In Front of Body) -->
             <g class="cat-leg-br">
-              <path d="M135 60 Q145 78 152 86 Q146 90 140 88 Q130 76 126 62 Z" fill="#F48C42"/>
-              <ellipse cx="147" cy="87" rx="5" ry="3" fill="#FFE5D9"/>
+              <path d="M135 60 Q145 78 152 86 Q146 90 140 88 Q130 76 126 62 Z" fill="#F48C42" />
+              <ellipse cx="147" cy="87" rx="5" ry="3" fill="#FFE5D9" />
             </g>
             <g class="cat-leg-fr">
-              <path d="M65 60 Q55 78 48 88 Q53 92 58 89 Q68 78 74 62 Z" fill="#F48C42"/>
-              <ellipse cx="52" cy="89" rx="5" ry="3" fill="#FFE5D9"/>
+              <path d="M65 60 Q55 78 48 88 Q53 92 58 89 Q68 78 74 62 Z" fill="#F48C42" />
+              <ellipse cx="52" cy="89" rx="5" ry="3" fill="#FFE5D9" />
             </g>
 
             <!-- Cat Head -->
-            <circle cx="50" cy="40" r="21" fill="#F48C42"/>
+            <circle cx="50" cy="40" r="21" fill="#F48C42" />
             <!-- Left Ear -->
-            <polygon points="34,30 38,10 50,23" fill="#F48C42"/>
-            <polygon points="37,27 40,15 47,23" fill="#FFB4A2"/>
+            <polygon points="34,30 38,10 50,23" fill="#F48C42" />
+            <polygon points="37,27 40,15 47,23" fill="#FFB4A2" />
             <!-- Right Ear -->
-            <polygon points="52,23 64,12 66,32" fill="#F48C42"/>
-            <polygon points="55,24 62,17 63,29" fill="#FFB4A2"/>
-            
+            <polygon points="52,23 64,12 66,32" fill="#F48C42" />
+            <polygon points="55,24 62,17 63,29" fill="#FFB4A2" />
+
             <!-- Eyes (Happy Closed Running Eyes ^_^) -->
-            <path d="M38 38 Q42 34 46 38" stroke="#2C3E50" stroke-width="2.2" stroke-linecap="round"/>
-            <path d="M52 38 Q56 34 60 38" stroke="#2C3E50" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M38 38 Q42 34 46 38" stroke="#2C3E50" stroke-width="2.2" stroke-linecap="round" />
+            <path d="M52 38 Q56 34 60 38" stroke="#2C3E50" stroke-width="2.2" stroke-linecap="round" />
 
             <!-- Cute Pink Nose & Mouth -->
-            <polygon points="48,42 50,45 52,42" fill="#FF758F"/>
-            <path d="M47 46 Q50 48 53 46" stroke="#2C3E50" stroke-width="1.5" stroke-linecap="round"/>
+            <polygon points="48,42 50,45 52,42" fill="#FF758F" />
+            <path d="M47 46 Q50 48 53 46" stroke="#2C3E50" stroke-width="1.5" stroke-linecap="round" />
 
             <!-- Whiskers -->
-            <line x1="33" y1="41" x2="22" y2="40" stroke="#FFE5D9" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="33" y1="44" x2="22" y2="47" stroke="#FFE5D9" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="65" y1="41" x2="76" y2="40" stroke="#FFE5D9" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="65" y1="44" x2="76" y2="47" stroke="#FFE5D9" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="33" y1="41" x2="22" y2="40" stroke="#FFE5D9" stroke-width="1.5" stroke-linecap="round" />
+            <line x1="33" y1="44" x2="22" y2="47" stroke="#FFE5D9" stroke-width="1.5" stroke-linecap="round" />
+            <line x1="65" y1="41" x2="76" y2="40" stroke="#FFE5D9" stroke-width="1.5" stroke-linecap="round" />
+            <line x1="65" y1="44" x2="76" y2="47" stroke="#FFE5D9" stroke-width="1.5" stroke-linecap="round" />
 
             <!-- Cheeks Blush -->
-            <circle cx="36" cy="44" r="3.5" fill="#FF758F" opacity="0.6"/>
-            <circle cx="62" cy="44" r="3.5" fill="#FF758F" opacity="0.6"/>
+            <circle cx="36" cy="44" r="3.5" fill="#FF758F" opacity="0.6" />
+            <circle cx="62" cy="44" r="3.5" fill="#FF758F" opacity="0.6" />
           </svg>
 
           <!-- Speed Dust Particles Under Paws -->
@@ -938,7 +1030,7 @@
          ============================================================= -->
     <section id="view-card" class="view-section">
       <div class="card-wrapper">
-        
+
         <!-- Top Control Bar -->
         <div class="card-top-bar">
           <div class="card-top-pill" id="card-badge">
@@ -984,7 +1076,7 @@
        JavaScript: State Machine, API Handler & Animations
        ============================================================= -->
   <script>
-    (function() {
+    (function () {
       // 1. Service Worker Registration
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1018,13 +1110,13 @@
 
       // 5. Standalone Mode Detection
       // Check if iOS standalone mode is active or user requested dev bypass
-      const isStandalone = (window.navigator.standalone === true) || 
-                           window.matchMedia('(display-mode: standalone)').matches;
-      
+      const isStandalone = (window.navigator.standalone === true) ||
+        window.matchMedia('(display-mode: standalone)').matches;
+
       const urlParams = new URLSearchParams(window.location.search);
-      const isDevBypass = urlParams.get('bypass') === 'true' || 
-                          window.location.hostname === 'localhost' || 
-                          window.location.hostname === '127.0.0.1';
+      const isDevBypass = urlParams.get('bypass') === 'true' ||
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1';
 
       // 6. Render Card Content
       function renderCardData(data) {
@@ -1281,7 +1373,7 @@
             switchView('card');
             setTimeout(() => spawnConfetti(80), 300);
             return;
-          } catch (e) {}
+          } catch (e) { }
         }
         switchView('login');
       });
@@ -1310,4 +1402,5 @@
     })();
   </script>
 </body>
+
 </html>
