@@ -1,0 +1,20 @@
+{
+  "name": "cindy-birthday-card",
+  "version": "1.0.0",
+  "description": "iOS Native-like Birthday Card PWA for Cindy",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "vercel:dev": "vercel dev"
+  },
+  "keywords": [
+    "pwa",
+    "ios",
+    "birthday-card",
+    "vercel"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}

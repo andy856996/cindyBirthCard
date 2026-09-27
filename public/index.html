@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Cindy's Birthday App</title>
+  
+  <!-- iOS PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Cindy's Card">
+  <meta name="theme-color" content="#0d0f17">
+  <meta name="format-detection" content="telephone=no">
+  
+  <!-- Icons & Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-512.png">
+  <link rel="icon" type="image/png" href="/icon-512.png">
+
+  <!-- Google Fonts for High-End Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* -------------------------------------------------------------
+       1. Global Reset & iOS Safe Area Tokens
+       ------------------------------------------------------------- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg-dark: #0d0f17;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #291b3d 0%, #151624 50%, #0d0f17 100%);
+      --accent-gold: #ffd166;
+      --accent-rose: #ff6b8b;
+      --accent-violet: #845ec2;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glass-bg: rgba(255, 255, 255, 0.07);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --glass-card-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 107, 139, 0.1);
+      --ios-font: -apple-system, BlinkMacSystemFont, "Outfit", "SF Pro Text", "Helvetica Neue", sans-serif;
+      --serif-font: "Noto Serif TC", serif;
+      --safe-top: env(safe-area-inset-top, 20px);
+      --safe-bottom: env(safe-area-inset-bottom, 20px);
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      background: var(--bg-dark);
+      background-image: var(--bg-gradient);
+      color: var(--text-main);
+      font-family: var(--ios-font);
+      -webkit-font-smoothing: antialiased;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    #app-container {
+      width: 100%;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Ambient Background Glow Orbs */
+    .ambient-glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.45;
+      animation: floatGlow 12s ease-in-out infinite alternate;
+    }
+    .ambient-glow-1 {
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, #ff6b8b, transparent 70%);
+      top: -60px;
+      left: -60px;
+    }
+    .ambient-glow-2 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #845ec2, transparent 70%);
+      bottom: 40px;
+      right: -50px;
+      animation-delay: -6s;
+    }
+
+    @keyframes floatGlow {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(25px, 35px) scale(1.15); }
+    }
+
+    /* Canvas for Confetti */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* -------------------------------------------------------------
+       2. Views Controller (Single Page States)
+       ------------------------------------------------------------- */
+    .view-section {
+      display: none;
+      width: 100%;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      padding: calc(var(--safe-top) + 24px) 20px calc(var(--safe-bottom) + 30px);
+      z-index: 10;
+      position: relative;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(12px);
+    }
+
+    .view-section.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* -------------------------------------------------------------
+       3. VIEW A: Safari Standalone Installation Guide
+       ------------------------------------------------------------- */
+    .guide-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 32px 24px;
+      box-shadow: var(--glass-card-shadow);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .ios-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-gold);
+      margin-bottom: 18px;
+      letter-spacing: 0.5px;
+    }
+
+    .guide-icon-preview {
+      width: 88px;
+      height: 88px;
+      border-radius: 22px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(255, 107, 139, 0.35);
+      margin-bottom: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .guide-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #ffffff 30%, #ffc2d1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .guide-desc {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .guide-steps {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+    }
+
+    .step-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-rose), var(--accent-violet));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      font-size: 14px;
+      color: #e2e8f0;
+      line-height: 1.45;
+    }
+
+    .step-highlight {
+      color: var(--accent-gold);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Safari Share Button Pointer at bottom */
+    .safari-bottom-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      animation: bounceArrow 1.8s ease-in-out infinite;
+    }
+
+    .safari-bottom-indicator span {
+      font-size: 13px;
+      color: var(--accent-gold);
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .share-icon-svg {
+      width: 28px;
+      height: 28px;
+      color: var(--accent-gold);
+      filter: drop-shadow(0 0 8px rgba(255, 209, 102, 0.5));
+    }
+
+    @keyframes bounceArrow {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    .dev-bypass-btn {
+      margin-top: 22px;
+      background: none;
+      border: 1px dashed rgba(255, 255, 255, 0.25);
+      color: var(--text-muted);
+      font-size: 13px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .dev-bypass-btn:hover {
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* -------------------------------------------------------------
+       4. VIEW B: iOS Lock Screen / Password Verification
+       ------------------------------------------------------------- */
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid var(--glass-border);
+      border-radius: 32px;
+      padding: 36px 24px;
+      box-shadow: var(--glass-card-shadow);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .login-icon-box {
+      width: 80px;
+      height: 80px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255, 107, 139, 0.2), rgba(132, 94, 194, 0.2));
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
+      position: relative;
+    }
+
+    .login-icon-box img {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+    }
+
+    .login-title {
+      font-size: 23px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 26px;
+    }
+
+    .pin-input-group {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .pin-input {
+      width: 100%;
+      max-width: 260px;
+      height: 52px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      color: #fff;
+      font-size: 22px;
+      text-align: center;
+      letter-spacing: 6px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .pin-input:focus {
+      border-color: var(--accent-rose);
+      box-shadow: 0 0 18px rgba(255, 107, 139, 0.35);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .pin-input::placeholder {
+      font-size: 14px;
+      letter-spacing: 0;
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    .login-btn {
+      width: 100%;
+      max-width: 260px;
+      height: 50px;
+      border-radius: 16px;
+      border: none;
+      background: linear-gradient(135deg, #ff6b8b, #845ec2);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(255, 107, 139, 0.4);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .login-btn:active {
+      transform: scale(0.97);
+      box-shadow: 0 4px 12px rgba(255, 107, 139, 0.3);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-msg {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #ff859e;
+      background: rgba(255, 107, 139, 0.12);
+      border: 1px solid rgba(255, 107, 139, 0.25);
+      padding: 8px 16px;
+      border-radius: 12px;
+      display: none;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    /* -------------------------------------------------------------
+       5. VIEW C: Running Cat Loading Animation (3s Delay)
+       ------------------------------------------------------------- */
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    /* Cat Stage Area */
+    .cat-stage {
+      width: 240px;
+      height: 140px;
+      position: relative;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* SVG Running Cat & Keyframes */
+    .running-cat-svg {
+      width: 170px;
+      height: 100px;
+      filter: drop-shadow(0 10px 20px rgba(255, 107, 139, 0.3));
+      animation: catBob 0.35s ease-in-out infinite alternate;
+    }
+
+    @keyframes catBob {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-7px) rotate(-1deg); }
+    }
+
+    .cat-leg-fl {
+      transform-origin: 55px 65px;
+      animation: legRunFront 0.35s ease-in-out infinite alternate;
+    }
+    .cat-leg-fr {
+      transform-origin: 65px 65px;
+      animation: legRunBack 0.35s ease-in-out infinite alternate;
+    }
+    .cat-leg-bl {
+      transform-origin: 125px 60px;
+      animation: legRunBack 0.35s ease-in-out infinite alternate;
+    }
+    .cat-leg-br {
+      transform-origin: 135px 60px;
+      animation: legRunFront 0.35s ease-in-out infinite alternate;
+    }
+
+    @keyframes legRunFront {
+      0% { transform: rotate(32deg); }
+      100% { transform: rotate(-32deg); }
+    }
+
+    @keyframes legRunBack {
+      0% { transform: rotate(-32deg); }
+      100% { transform: rotate(32deg); }
+    }
+
+    .cat-tail {
+      transform-origin: 138px 48px;
+      animation: tailWhip 0.35s ease-in-out infinite alternate;
+    }
+
+    @keyframes tailWhip {
+      0% { transform: rotate(-15deg); }
+      100% { transform: rotate(20deg); }
+    }
+
+    /* Running Ground & Dust Trails */
+    .ground-line {
+      position: absolute;
+      bottom: 22px;
+      width: 220px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, rgba(255, 209, 102, 0.6), rgba(255, 107, 139, 0.8), transparent);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .ground-particles {
+      position: absolute;
+      bottom: 26px;
+      left: 30px;
+      width: 50px;
+      height: 20px;
+    }
+
+    .dust-puff {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.45);
+      animation: dustFly 0.5s linear infinite;
+    }
+
+    .dust-1 { width: 8px; height: 8px; bottom: 2px; left: 10px; animation-delay: 0s; }
+    .dust-2 { width: 6px; height: 6px; bottom: 8px; left: 18px; animation-delay: 0.18s; }
+    .dust-3 { width: 10px; height: 10px; bottom: 4px; left: 4px; animation-delay: 0.32s; }
+
+    @keyframes dustFly {
+      0% { transform: translate(0, 0) scale(1); opacity: 0.8; }
+      100% { transform: translate(-28px, -12px) scale(0.2); opacity: 0; }
+    }
+
+    /* Loading Text & Progress Bar */
+    .loading-title {
+      font-size: 19px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+      letter-spacing: 0.2px;
+    }
+
+    .loading-tip {
+      font-size: 14px;
+      color: var(--accent-gold);
+      margin-bottom: 22px;
+      font-weight: 400;
+    }
+
+    .loading-bar-wrapper {
+      width: 200px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loading-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-rose), var(--accent-gold));
+      border-radius: 10px;
+      transition: width 3s linear;
+    }
+
+    /* -------------------------------------------------------------
+       6. VIEW D: Unlocked Birthday Card (Grand Climax)
+       ------------------------------------------------------------- */
+    .card-wrapper {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding-bottom: 30px;
+    }
+
+    /* Top Floating Action Bar */
+    .card-top-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+    }
+
+    .card-top-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-gold);
+    }
+
+    .card-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-ctrl-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .icon-ctrl-btn:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Main Birthday Card Body */
+    .birthday-main-card {
+      width: 100%;
+      background: rgba(25, 22, 38, 0.7);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      border: 1.5px solid rgba(255, 255, 255, 0.18);
+      border-radius: 32px;
+      padding: 32px 24px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 107, 139, 0.15);
+      position: relative;
+      overflow: hidden;
+      animation: cardPopIn 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes cardPopIn {
+      0% { transform: scale(0.92) translateY(20px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    /* Decorative Crown Stamp */
+    .card-crown {
+      position: absolute;
+      top: -15px;
+      right: 25px;
+      font-size: 64px;
+      opacity: 0.12;
+      pointer-events: none;
+      transform: rotate(18deg);
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-family: var(--serif-font);
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.35;
+      background: linear-gradient(135deg, #ffffff 10%, #ffd166 60%, #ff6b8b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 13.5px;
+      color: var(--accent-gold);
+      opacity: 0.9;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    /* Photo Carousel / Polaroid Stack */
+    .photo-stack-wrapper {
+      width: 100%;
+      margin-bottom: 24px;
+    }
+
+    .photo-display-frame {
+      width: 100%;
+      height: 220px;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: #1a1a26;
+    }
+
+    .photo-slide-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .photo-caption-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(180deg, transparent 0%, rgba(13, 15, 23, 0.88) 100%);
+      padding: 18px 16px 10px;
+      font-size: 12.5px;
+      color: #f1f5f9;
+      line-height: 1.4;
+    }
+
+    .photo-nav-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .photo-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .photo-dot.active {
+      width: 18px;
+      border-radius: 4px;
+      background: var(--accent-rose);
+    }
+
+    /* Heartfelt Letter Section */
+    .letter-body {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .letter-greeting {
+      font-family: var(--serif-font);
+      font-size: 17px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .letter-paragraph {
+      font-family: var(--serif-font);
+      font-size: 14.5px;
+      line-height: 1.8;
+      color: #cbd5e1;
+      margin-bottom: 14px;
+      text-align: justify;
+    }
+    .letter-paragraph:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Birthday Wishes Grid */
+    .wishes-section {
+      margin-bottom: 22px;
+    }
+
+    .wishes-heading {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-gold);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .wishes-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .wish-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      font-size: 13.5px;
+      color: #e2e8f0;
+      transition: transform 0.2s ease;
+    }
+
+    .wish-chip:active {
+      transform: scale(0.98);
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .card-footer {
+      text-align: right;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card-signature {
+      font-family: var(--serif-font);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--accent-rose);
+      margin-bottom: 4px;
+    }
+
+    .card-date {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Bottom Reset / Lock Bar */
+    .bottom-action-row {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .bottom-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 20px;
+      color: #94a3b8;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .bottom-btn:active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Responsive adjustments */
+    @media (max-height: 680px) {
+      .guide-card, .login-card, .birthday-main-card {
+        padding: 24px 18px;
+      }
+      .photo-display-frame {
+        height: 180px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Ambient Backdrops -->
+  <div class="ambient-glow ambient-glow-1"></div>
+  <div class="ambient-glow ambient-glow-2"></div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <div id="app-container">
+
+    <!-- =============================================================
+         VIEW A: Safari Installation Guide (Shown when NOT standalone)
+         ============================================================= -->
+    <section id="view-safari-guide" class="view-section">
+      <div class="guide-card">
+        <div class="ios-badge">
+          <span></span> iOS 原生模式體驗
+        </div>
+        
+        <img src="/icon-512.png" alt="App Icon" class="guide-icon-preview">
+        
+        <h1 class="guide-title">專屬賀卡 App 已就緒</h1>
+        <p class="guide-desc">
+          為提供如 iOS 原生 App 般的專屬儀式感，本賀卡需以<strong>「獨立 App 模式」</strong>啟動以解鎖神秘內容。
+        </p>
+
+        <div class="guide-steps">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-text">
+              請點擊 Safari 底部工具列的 <span class="step-highlight">
+                <svg class="share-icon-svg" style="width:16px;height:16px;display:inline-block;vertical-align:middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                  <polyline points="16 6 12 2 8 6"/>
+                  <line x1="12" y1="2" x2="12" y2="15"/>
+                </svg> 分享
+              </span> 圖示
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-text">
+              在功能清單中滑動，點選 <span class="step-highlight">➕「加入主畫面」</span>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-text">
+              點擊右上角新增後，從 <strong>iPhone 桌面圖示</strong> 點開本 App 即可開啟解鎖畫面！
+            </div>
+          </div>
+        </div>
+
+        <button id="dev-bypass-btn" class="dev-bypass-btn">
+          💻 開發者／電腦瀏覽器預覽模式 (點此直接測試)
+        </button>
+      </div>
+
+      <!-- Bouncing Arrow pointing to iPhone Safari Bottom Bar -->
+      <div class="safari-bottom-indicator">
+        <svg class="share-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+          <polyline points="16 6 12 2 8 6"/>
+          <line x1="12" y1="2" x2="12" y2="15"/>
+        </svg>
+        <span>點擊下方 Safari 分享按鈕</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
+      </div>
+    </section>
+
+    <!-- =============================================================
+         VIEW B: Passcode Login (iOS Standalone Screen)
+         ============================================================= -->
+    <section id="view-login" class="view-section">
+      <div class="login-card">
+        <div class="login-icon-box">
+          <img src="/icon-512.png" alt="App Icon">
+        </div>
+
+        <h1 class="login-title">Cindy's Birthday</h1>
+        <p class="login-subtitle">請輸入專屬通關密語開啟驚喜</p>
+
+        <form id="login-form" class="pin-input-group" onsubmit="return false;">
+          <input
+            type="password"
+            id="password-input"
+            class="pin-input"
+            placeholder="請輸入密碼"
+            maxlength="12"
+            autocomplete="off"
+            inputmode="numeric"
+          />
+
+          <button type="submit" id="submit-btn" class="login-btn">
+            <span>解鎖賀卡</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </form>
+
+        <div id="login-error" class="error-msg"></div>
+      </div>
+    </section>
+
+    <!-- =============================================================
+         VIEW C: Running Cat Loading Animation (3-Second Delay)
+         ============================================================= -->
+    <section id="view-loading" class="view-section">
+      <div class="loading-container">
+        <div class="cat-stage">
+          <!-- Handcrafted SVG Running Cat with Legs & Tail Animation -->
+          <svg class="running-cat-svg" viewBox="0 0 180 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Cat Back Legs (Behind Body) -->
+            <g class="cat-leg-bl">
+              <path d="M125 58 Q135 78 140 88 Q136 92 130 90 Q120 78 116 62 Z" fill="#E67E42"/>
+              <ellipse cx="135" cy="89" rx="5" ry="3" fill="#FFE5D9"/>
+            </g>
+            <g class="cat-leg-fl">
+              <path d="M55 58 Q45 76 38 86 Q43 90 48 88 Q58 76 64 60 Z" fill="#E67E42"/>
+              <ellipse cx="42" cy="88" rx="5" ry="3" fill="#FFE5D9"/>
+            </g>
+
+            <!-- Tail -->
+            <g class="cat-tail">
+              <path d="M136 48 C155 45 168 32 165 20 C162 14 154 16 156 24 C158 32 148 40 134 44 Z" fill="#F48C42"/>
+              <!-- Tail Tip Sparkle / White patch -->
+              <circle cx="164" cy="20" r="3.5" fill="#FFF"/>
+            </g>
+
+            <!-- Cat Main Torso -->
+            <ellipse cx="94" cy="54" rx="42" ry="24" fill="#F48C42"/>
+            <!-- Cute Belly White Patch -->
+            <path d="M72 62 C82 72 108 72 118 62 C108 68 82 68 72 62 Z" fill="#FFE5D9"/>
+            <!-- Orange Striping Accent -->
+            <path d="M84 36 Q88 44 82 48" stroke="#D35400" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M96 34 Q100 44 94 48" stroke="#D35400" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M108 36 Q112 44 106 48" stroke="#D35400" stroke-width="2.5" stroke-linecap="round"/>
+
+            <!-- Cat Front Legs (In Front of Body) -->
+            <g class="cat-leg-br">
+              <path d="M135 60 Q145 78 152 86 Q146 90 140 88 Q130 76 126 62 Z" fill="#F48C42"/>
+              <ellipse cx="147" cy="87" rx="5" ry="3" fill="#FFE5D9"/>
+            </g>
+            <g class="cat-leg-fr">
+              <path d="M65 60 Q55 78 48 88 Q53 92 58 89 Q68 78 74 62 Z" fill="#F48C42"/>
+              <ellipse cx="52" cy="89" rx="5" ry="3" fill="#FFE5D9"/>
+            </g>
+
+            <!-- Cat Head -->
+            <circle cx="50" cy="40" r="21" fill="#F48C42"/>
+            <!-- Left Ear -->
+            <polygon points="34,30 38,10 50,23" fill="#F48C42"/>
+            <polygon points="37,27 40,15 47,23" fill="#FFB4A2"/>
+            <!-- Right Ear -->
+            <polygon points="52,23 64,12 66,32" fill="#F48C42"/>
+            <polygon points="55,24 62,17 63,29" fill="#FFB4A2"/>
+            
+            <!-- Eyes (Happy Closed Running Eyes ^_^) -->
+            <path d="M38 38 Q42 34 46 38" stroke="#2C3E50" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M52 38 Q56 34 60 38" stroke="#2C3E50" stroke-width="2.2" stroke-linecap="round"/>
+
+            <!-- Cute Pink Nose & Mouth -->
+            <polygon points="48,42 50,45 52,42" fill="#FF758F"/>
+            <path d="M47 46 Q50 48 53 46" stroke="#2C3E50" stroke-width="1.5" stroke-linecap="round"/>
+
+            <!-- Whiskers -->
+            <line x1="33" y1="41" x2="22" y2="40" stroke="#FFE5D9" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="33" y1="44" x2="22" y2="47" stroke="#FFE5D9" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="65" y1="41" x2="76" y2="40" stroke="#FFE5D9" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="65" y1="44" x2="76" y2="47" stroke="#FFE5D9" stroke-width="1.5" stroke-linecap="round"/>
+
+            <!-- Cheeks Blush -->
+            <circle cx="36" cy="44" r="3.5" fill="#FF758F" opacity="0.6"/>
+            <circle cx="62" cy="44" r="3.5" fill="#FF758F" opacity="0.6"/>
+          </svg>
+
+          <!-- Speed Dust Particles Under Paws -->
+          <div class="ground-particles">
+            <div class="dust-puff dust-1"></div>
+            <div class="dust-puff dust-2"></div>
+            <div class="dust-puff dust-3"></div>
+          </div>
+
+          <!-- Speed Ground Line -->
+          <div class="ground-line"></div>
+        </div>
+
+        <h2 id="loading-title" class="loading-title">正在為你打開神秘禮物...</h2>
+        <p id="loading-tip" class="loading-tip">小貓正在加急運送祝福中 🐾✨</p>
+
+        <div class="loading-bar-wrapper">
+          <div id="loading-progress" class="loading-bar-fill"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================================================
+         VIEW D: Birthday Card Reveal (Unlocked State)
+         ============================================================= -->
+    <section id="view-card" class="view-section">
+      <div class="card-wrapper">
+        
+        <!-- Top Control Bar -->
+        <div class="card-top-bar">
+          <div class="card-top-pill" id="card-badge">
+            ✨ Special Edition · Birthday Card
+          </div>
+          <div class="card-controls">
+            <button id="music-toggle-btn" class="icon-ctrl-btn" title="播放歡慶生日音樂">
+              🎵
+            </button>
+            <button id="confetti-btn" class="icon-ctrl-btn" title="再放一次彩帶">
+              🎉
+            </button>
+          </div>
+        </div>
+
+        <!-- Birthday Main Card Body -->
+        <article class="birthday-main-card">
+          <div class="card-crown">👑</div>
+
+          <div class="card-header">
+            <h1 id="card-title" class="card-title">Happy Birthday, Cindy! 🎂✨</h1>
+            <p id="card-subtitle" class="card-subtitle">願新的一歲，奔赴星海，萬物明朗</p>
+          </div>
+
+          <!-- Interactive Photo Carousel -->
+          <div class="photo-stack-wrapper">
+            <div class="photo-display-frame" id="photo-frame">
+              <img id="carousel-img" class="photo-slide-img" src="" alt="Birthday Memory">
+              <div id="carousel-caption" class="photo-caption-bar"></div>
+            </div>
+            <div id="carousel-dots" class="photo-nav-dots"></div>
+          </div>
+
+          <!-- Heartfelt Letter Body -->
+          <div class="letter-body">
+            <div id="letter-greeting" class="letter-greeting">
+              親愛的 Cindy：祝妳生日快樂！
+            </div>
+            <div id="letter-paragraphs"></div>
+          </div>
+
+          <!-- Wishes Chips Section -->
+          <div class="wishes-section">
+            <div class="wishes-heading">Special Wishes For You</div>
+            <div class="wishes-grid" id="wishes-container"></div>
+          </div>
+
+          <!-- Signature Footer -->
+          <div class="card-footer">
+            <div id="card-signature" class="card-signature">With Love & Best Wishes ❤️</div>
+            <div id="card-date" class="card-date">March 22</div>
+          </div>
+        </article>
+
+        <!-- Bottom Reset Row -->
+        <div class="bottom-action-row">
+          <button id="relock-btn" class="bottom-btn">
+            🔒 重新上鎖本卡片
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- =============================================================
+       JavaScript: State Machine, API Handler & Animations
+       ============================================================= -->
+  <script>
+    (function() {
+      // 1. Service Worker Registration
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => {
+            console.log('SW registration note:', err);
+          });
+        });
+      }
+
+      // 2. Constants & Storage Key
+      const STORAGE_KEY = 'birthday_unlocked_data';
+
+      // 3. View Elements
+      const views = {
+        safariGuide: document.getElementById('view-safari-guide'),
+        login: document.getElementById('view-login'),
+        loading: document.getElementById('view-loading'),
+        card: document.getElementById('view-card')
+      };
+
+      // 4. State Switcher Function
+      function switchView(viewName) {
+        Object.keys(views).forEach(key => {
+          if (key === viewName) {
+            views[key].classList.add('active');
+          } else {
+            views[key].classList.remove('active');
+          }
+        });
+      }
+
+      // 5. Standalone Mode Detection
+      // Check if iOS standalone mode is active or user requested dev bypass
+      const isStandalone = (window.navigator.standalone === true) || 
+                           window.matchMedia('(display-mode: standalone)').matches;
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const isDevBypass = urlParams.get('bypass') === 'true' || 
+                          window.location.hostname === 'localhost' || 
+                          window.location.hostname === '127.0.0.1';
+
+      // 6. Carousel State
+      let carouselPhotos = [];
+      let currentPhotoIndex = 0;
+      let carouselInterval = null;
+
+      function renderCarousel(photos) {
+        if (!photos || photos.length === 0) return;
+        carouselPhotos = photos;
+        currentPhotoIndex = 0;
+
+        const imgEl = document.getElementById('carousel-img');
+        const capEl = document.getElementById('carousel-caption');
+        const dotsEl = document.getElementById('carousel-dots');
+
+        dotsEl.innerHTML = '';
+        photos.forEach((_, idx) => {
+          const dot = document.createElement('div');
+          dot.className = 'photo-dot' + (idx === 0 ? ' active' : '');
+          dot.addEventListener('click', () => setPhoto(idx));
+          dotsEl.appendChild(dot);
+        });
+
+        function updateSlide() {
+          const item = carouselPhotos[currentPhotoIndex];
+          imgEl.style.opacity = '0';
+          setTimeout(() => {
+            imgEl.src = item.url;
+            capEl.textContent = item.caption || '';
+            imgEl.style.opacity = '1';
+          }, 150);
+
+          Array.from(dotsEl.children).forEach((dot, idx) => {
+            dot.className = 'photo-dot' + (idx === currentPhotoIndex ? ' active' : '');
+          });
+        }
+
+        function setPhoto(idx) {
+          currentPhotoIndex = idx;
+          updateSlide();
+          resetCarouselTimer();
+        }
+
+        function resetCarouselTimer() {
+          if (carouselInterval) clearInterval(carouselInterval);
+          carouselInterval = setInterval(() => {
+            currentPhotoIndex = (currentPhotoIndex + 1) % carouselPhotos.length;
+            updateSlide();
+          }, 4500);
+        }
+
+        // Tap photo to advance
+        document.getElementById('photo-frame').onclick = () => {
+          currentPhotoIndex = (currentPhotoIndex + 1) % carouselPhotos.length;
+          updateSlide();
+          resetCarouselTimer();
+        };
+
+        updateSlide();
+        resetCarouselTimer();
+      }
+
+      // 7. Render Card Content
+      function renderCardData(data) {
+        if (!data) return;
+
+        if (data.badge) document.getElementById('card-badge').textContent = data.badge;
+        if (data.title) document.getElementById('card-title').textContent = data.title;
+        if (data.subtitle) document.getElementById('card-subtitle').textContent = data.subtitle;
+        if (data.greeting) document.getElementById('letter-greeting').textContent = data.greeting;
+        if (data.signature) document.getElementById('card-signature').textContent = data.signature;
+        if (data.date) document.getElementById('card-date').textContent = data.date;
+
+        // Render message paragraphs
+        const letterContainer = document.getElementById('letter-paragraphs');
+        letterContainer.innerHTML = '';
+        if (Array.isArray(data.message)) {
+          data.message.forEach(p => {
+            const el = document.createElement('p');
+            el.className = 'letter-paragraph';
+            el.textContent = p;
+            letterContainer.appendChild(el);
+          });
+        }
+
+        // Render wishes
+        const wishesContainer = document.getElementById('wishes-container');
+        wishesContainer.innerHTML = '';
+        if (Array.isArray(data.wishes)) {
+          data.wishes.forEach(item => {
+            const chip = document.createElement('div');
+            chip.className = 'wish-chip';
+            const icon = typeof item === 'object' ? item.icon : '✨';
+            const text = typeof item === 'object' ? item.text : item;
+            chip.innerHTML = `<span>${icon}</span> <span>${text}</span>`;
+            wishesContainer.appendChild(chip);
+          });
+        }
+
+        // Render photos
+        if (Array.isArray(data.photos) && data.photos.length > 0) {
+          renderCarousel(data.photos);
+        }
+      }
+
+      // 8. Confetti Generator (Canvas)
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let confettiActive = false;
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      const CONFETTI_COLORS = ['#ff6b8b', '#ffd166', '#845ec2', '#06d6a0', '#118ab2', '#ff9ebb', '#ffffff'];
+
+      function spawnConfetti(count = 90) {
+        for (let i = 0; i < count; i++) {
+          particles.push({
+            x: Math.random() * canvas.width,
+            y: -20 - Math.random() * 50,
+            r: 4 + Math.random() * 6,
+            color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+            vx: -3 + Math.random() * 6,
+            vy: 3 + Math.random() * 5,
+            tilt: Math.random() * 10,
+            tiltAngle: Math.random() * Math.PI,
+            tiltAngleInc: 0.05 + Math.random() * 0.05
+          });
+        }
+        if (!confettiActive) {
+          confettiActive = true;
+          requestAnimationFrame(renderConfetti);
+        }
+      }
+
+      function renderConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.tiltAngle += p.tiltAngleInc;
+          p.y += (Math.cos(p.tiltAngle) + 3 + p.r / 2) / 1.5;
+          p.x += Math.sin(p.tiltAngle) * 2;
+          p.tilt = Math.sin(p.tiltAngle) * 15;
+
+          ctx.beginPath();
+          ctx.lineWidth = p.r / 2;
+          ctx.strokeStyle = p.color;
+          ctx.moveTo(p.x + p.tilt + p.r / 4, p.y);
+          ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 4);
+          ctx.stroke();
+        }
+
+        particles = particles.filter(p => p.y < canvas.height + 30);
+        if (particles.length > 0) {
+          requestAnimationFrame(renderConfetti);
+        } else {
+          confettiActive = false;
+        }
+      }
+
+      // 9. Web Audio API synthesized Happy Birthday chime (No external MP3 needed!)
+      let audioCtx = null;
+      let isPlayingMusic = false;
+
+      function playBirthdayChime() {
+        try {
+          if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          }
+          if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+
+          // Melodic sequence for Happy Birthday
+          const notes = [
+            { f: 261.63, d: 0.25 }, // C4
+            { f: 261.63, d: 0.25 }, // C4
+            { f: 293.66, d: 0.5 },  // D4
+            { f: 261.63, d: 0.5 },  // C4
+            { f: 349.23, d: 0.5 },  // F4
+            { f: 329.63, d: 1.0 },  // E4
+            { f: 261.63, d: 0.25 }, // C4
+            { f: 261.63, d: 0.25 }, // C4
+            { f: 293.66, d: 0.5 },  // D4
+            { f: 261.63, d: 0.5 },  // C4
+            { f: 392.00, d: 0.5 },  // G4
+            { f: 349.23, d: 1.0 },  // F4
+            { f: 261.63, d: 0.25 }, // C4
+            { f: 261.63, d: 0.25 }, // C4
+            { f: 523.25, d: 0.5 },  // C5
+            { f: 440.00, d: 0.5 },  // A4
+            { f: 349.23, d: 0.5 },  // F4
+            { f: 329.63, d: 0.5 },  // E4
+            { f: 293.66, d: 0.75 }, // D4
+            { f: 466.16, d: 0.3 },  // Bb4
+            { f: 466.16, d: 0.3 },  // Bb4
+            { f: 440.00, d: 0.5 },  // A4
+            { f: 349.23, d: 0.5 },  // F4
+            { f: 392.00, d: 0.5 },  // G4
+            { f: 349.23, d: 1.2 }   // F4
+          ];
+
+          let currTime = audioCtx.currentTime + 0.1;
+          notes.forEach(note => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(note.f, currTime);
+
+            gain.gain.setValueAtTime(0.001, currTime);
+            gain.gain.exponentialRampToValueAtTime(0.18, currTime + 0.04);
+            gain.gain.exponentialRampToValueAtTime(0.0001, currTime + note.d);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start(currTime);
+            osc.stop(currTime + note.d + 0.05);
+
+            currTime += note.d + 0.05;
+          });
+        } catch (e) {
+          console.log('Audio init notice:', e);
+        }
+      }
+
+      // 10. Login Submit & 3-Second Running Cat Loading Routine
+      const loginForm = document.getElementById('login-form');
+      const passwordInput = document.getElementById('password-input');
+      const submitBtn = document.getElementById('submit-btn');
+      const errorMsg = document.getElementById('login-error');
+      const loadingProgressBar = document.getElementById('loading-progress');
+
+      async function handleLogin() {
+        const password = passwordInput.value.trim();
+        if (!password) {
+          showError('請輸入通關密碼 🔑');
+          return;
+        }
+
+        // Lock button
+        submitBtn.disabled = true;
+        submitBtn.querySelector('span').textContent = '驗證中...';
+        errorMsg.style.display = 'none';
+
+        try {
+          const response = await fetch('/api/verify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ password })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok || !data.success) {
+            showError(data.error || '密碼不正確，請再試一次');
+            submitBtn.disabled = false;
+            submitBtn.querySelector('span').textContent = '解鎖賀卡';
+            return;
+          }
+
+          // Verification Succeeded! Save to localStorage
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data.cardData));
+
+          // Switch to Running Cat View & begin exactly 3000ms delay
+          switchView('loading');
+          loadingProgressBar.style.width = '0%';
+          setTimeout(() => {
+            loadingProgressBar.style.width = '100%';
+          }, 30);
+
+          // 3-Second Wait
+          setTimeout(() => {
+            renderCardData(data.cardData);
+            switchView('card');
+            spawnConfetti(120);
+            playBirthdayChime();
+          }, 3000);
+
+        } catch (err) {
+          console.error(err);
+          showError('連線異常，請確認網路或稍後再試');
+          submitBtn.disabled = false;
+          submitBtn.querySelector('span').textContent = '解鎖賀卡';
+        }
+      }
+
+      function showError(msg) {
+        errorMsg.textContent = msg;
+        errorMsg.style.display = 'inline-block';
+        passwordInput.style.borderColor = 'var(--accent-rose)';
+        passwordInput.focus();
+      }
+
+      loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleLogin();
+      });
+
+      // 11. Initial Entry Decision
+      function initApp() {
+        // Check if unlocked data already cached in localStorage
+        const cachedData = localStorage.getItem(STORAGE_KEY);
+
+        // Check if user is in standalone mode or dev bypass mode
+        const canAccess = isStandalone || isDevBypass;
+
+        if (!canAccess) {
+          // Not in standalone: strictly display Safari guidance screen
+          switchView('safariGuide');
+          return;
+        }
+
+        // In standalone or dev bypass:
+        if (cachedData) {
+          try {
+            const parsed = JSON.parse(cachedData);
+            renderCardData(parsed);
+            switchView('card');
+            setTimeout(() => spawnConfetti(80), 300);
+            return;
+          } catch (e) {
+            localStorage.removeItem(STORAGE_KEY);
+          }
+        }
+
+        // Otherwise show login passcode screen
+        switchView('login');
+      }
+
+      // Event listeners for actions
+      document.getElementById('dev-bypass-btn').addEventListener('click', () => {
+        const cachedData = localStorage.getItem(STORAGE_KEY);
+        if (cachedData) {
+          try {
+            renderCardData(JSON.parse(cachedData));
+            switchView('card');
+            setTimeout(() => spawnConfetti(80), 300);
+            return;
+          } catch (e) {}
+        }
+        switchView('login');
+      });
+
+      document.getElementById('confetti-btn').addEventListener('click', () => {
+        spawnConfetti(90);
+      });
+
+      document.getElementById('music-toggle-btn').addEventListener('click', () => {
+        playBirthdayChime();
+      });
+
+      document.getElementById('relock-btn').addEventListener('click', () => {
+        if (confirm('確定要將卡片重新上鎖嗎？下次需要重新輸入密碼。')) {
+          localStorage.removeItem(STORAGE_KEY);
+          passwordInput.value = '';
+          submitBtn.disabled = false;
+          submitBtn.querySelector('span').textContent = '解鎖賀卡';
+          switchView('login');
+        }
+      });
+
+      // Launch!
+      initApp();
+
+    })();
+  </script>
+</body>
+</html>
