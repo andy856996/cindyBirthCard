@@ -1,6 +1,6 @@
 /**
  * Vercel Serverless Function: api/verify.js
- * 賀卡安全驗證 API - 確保賀卡敏感文字、私密照片與祝詞不暴露在前端原始碼中
+ * 賀卡安全驗證 API - 確保賀卡敏感文字不暴露在前端原始碼中
  */
 
 export default async function handler(req, res) {
@@ -29,55 +29,26 @@ export default async function handler(req, res) {
 
     const { password } = body || {};
 
-    // 3. 比對環境變數中的生日密碼 (預設為 0928)
-    const expectedPassword = process.env.BIRTHDAY_PASSWORD || '20260928';
+    // 3. 比對環境變數中的生日密碼
+    const expectedPassword = process.env.BIRTHDAY_PASSWORD;
 
-    if (!password || String(password).trim() !== String(expectedPassword).trim()) {
+    if (!expectedPassword || !password || String(password).trim() !== String(expectedPassword).trim()) {
       return res.status(401).json({
         success: false,
-        error: '密碼錯誤！請輸入專屬通關密碼 🔑'
+        error: '小呆瓜！密碼錯誤囉～請輸入專屬通關密碼'
       });
     }
 
-    // 4. 驗證成功：安全回傳賀卡專屬資料 (不在前端寫死)
-    const cardData = {
-      title: "Happy Birthday, Cindy! 🎂✨",
-      recipient: "Cindy",
-      badge: "Special Edition · iOS Birthday App",
-      greeting: "親愛的 Cindy：祝妳生日快樂！",
-      subtitle: "願新的一歲，奔赴星海，萬物明朗，所求皆所願。",
-      message: [
-        "今天是屬於妳最特別的日子！願所有的溫柔與好運，都在這一刻如約而至。🌸",
-        "感謝有妳在身邊的每一段時光，為生活帶來無數歡笑與燦爛回憶。無論世界怎麼變，妳永遠是最閃閃發光、最獨特的存在。",
-        "願新的一歲裡：有喝不完的好茶、吃不胖的甜點、想去就去的旅行，以及永遠溫暖而堅定的陪伴。Happy Birthday! 🎉🥂"
-      ],
-      signature: "With Endless Love & Blessings ❤️",
-      date: "March 22",
-      photos: [
-        {
-          url: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=1000&q=80",
-          caption: "✨ 每一刻珍貴的歡聚時光，都是最閃亮的記憶"
-        },
-        {
-          url: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=1000&q=80",
-          caption: "🎈 願妳的笑容永遠如晴空般明媚燦爛"
-        },
-        {
-          url: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=1000&q=80",
-          caption: "🍰 吹滅蠟燭的這一刻，願妳許下的所有願望都一一成真"
-        }
-      ],
-      wishes: [
-        { icon: "✨", text: "萬事順遂，被愛與幸運包圍" },
-        { icon: "✈️", text: "去更多美麗的地方，看更遼闊的風景" },
-        { icon: "🍰", text: "永遠保持少女心與探索世界的好奇" },
-        { icon: "🐱", text: "每天都有可愛貓咪與毛孩療癒身心" }
-      ]
-    };
+    // 4. 從環境變數讀取 Base64 編碼的賀卡內文並解碼
+    const decodedMessage = Buffer.from(process.env.CARD_MESSAGE_BASE64 || '', 'base64').toString('utf-8');
 
+    // 5. 驗證成功：精簡回傳格式
     return res.status(200).json({
       success: true,
-      cardData
+      cardData: {
+        title: "Happy Birthday! 🎂",
+        message: decodedMessage
+      }
     });
   } catch (error) {
     console.error('Verify Handler Error:', error);

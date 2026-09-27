@@ -676,159 +676,22 @@
       margin-bottom: 8px;
     }
 
-    .card-subtitle {
-      font-size: 13.5px;
-      color: var(--accent-gold);
-      opacity: 0.9;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
-
-    /* Photo Carousel / Polaroid Stack */
-    .photo-stack-wrapper {
-      width: 100%;
-      margin-bottom: 24px;
-    }
-
-    .photo-display-frame {
-      width: 100%;
-      height: 220px;
-      border-radius: 20px;
-      overflow: hidden;
-      position: relative;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      background: #1a1a26;
-    }
-
-    .photo-slide-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-
-    .photo-caption-bar {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: linear-gradient(180deg, transparent 0%, rgba(13, 15, 23, 0.88) 100%);
-      padding: 18px 16px 10px;
-      font-size: 12.5px;
-      color: #f1f5f9;
-      line-height: 1.4;
-    }
-
-    .photo-nav-dots {
-      display: flex;
-      justify-content: center;
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .photo-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.25);
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-
-    .photo-dot.active {
-      width: 18px;
-      border-radius: 4px;
-      background: var(--accent-rose);
-    }
-
-    /* Heartfelt Letter Section */
-    .letter-body {
+    .card-message-body {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 20px;
+      padding: 24px 20px;
+      margin-bottom: 24px;
     }
 
-    .letter-greeting {
+    .card-message-text {
       font-family: var(--serif-font);
-      font-size: 17px;
-      font-weight: 600;
-      color: #fff;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .letter-paragraph {
-      font-family: var(--serif-font);
-      font-size: 14.5px;
-      line-height: 1.8;
-      color: #cbd5e1;
-      margin-bottom: 14px;
-      text-align: justify;
-    }
-    .letter-paragraph:last-child {
-      margin-bottom: 0;
-    }
-
-    /* Birthday Wishes Grid */
-    .wishes-section {
-      margin-bottom: 22px;
-    }
-
-    .wishes-heading {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--accent-gold);
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-
-    .wishes-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-
-    .wish-chip {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      font-size: 13.5px;
+      font-size: 15.5px;
+      line-height: 1.85;
       color: #e2e8f0;
-      transition: transform 0.2s ease;
-    }
-
-    .wish-chip:active {
-      transform: scale(0.98);
-      background: rgba(255, 255, 255, 0.09);
-    }
-
-    .card-footer {
-      text-align: right;
-      padding-top: 14px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .card-signature {
-      font-family: var(--serif-font);
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--accent-rose);
-      margin-bottom: 4px;
-    }
-
-    .card-date {
-      font-size: 12px;
-      color: var(--text-muted);
+      white-space: pre-wrap;
+      word-break: break-word;
+      letter-spacing: 0.3px;
     }
 
     /* Bottom Reset / Lock Bar */
@@ -1099,37 +962,12 @@
           <div class="card-crown">👑</div>
 
           <div class="card-header">
-            <h1 id="card-title" class="card-title">Happy Birthday, Cindy! 🎂✨</h1>
-            <p id="card-subtitle" class="card-subtitle">願新的一歲，奔赴星海，萬物明朗</p>
+            <h1 id="card-title" class="card-title">Happy Birthday! 🎂</h1>
           </div>
 
-          <!-- Interactive Photo Carousel -->
-          <div class="photo-stack-wrapper">
-            <div class="photo-display-frame" id="photo-frame">
-              <img id="carousel-img" class="photo-slide-img" src="" alt="Birthday Memory">
-              <div id="carousel-caption" class="photo-caption-bar"></div>
-            </div>
-            <div id="carousel-dots" class="photo-nav-dots"></div>
-          </div>
-
-          <!-- Heartfelt Letter Body -->
-          <div class="letter-body">
-            <div id="letter-greeting" class="letter-greeting">
-              親愛的 Cindy：祝妳生日快樂！
-            </div>
-            <div id="letter-paragraphs"></div>
-          </div>
-
-          <!-- Wishes Chips Section -->
-          <div class="wishes-section">
-            <div class="wishes-heading">Special Wishes For You</div>
-            <div class="wishes-grid" id="wishes-container"></div>
-          </div>
-
-          <!-- Signature Footer -->
-          <div class="card-footer">
-            <div id="card-signature" class="card-signature">With Love & Best Wishes ❤️</div>
-            <div id="card-date" class="card-date">March 22</div>
+          <!-- Message Body -->
+          <div class="card-message-body">
+            <div id="card-message" class="card-message-text"></div>
           </div>
         </article>
 
@@ -1191,107 +1029,17 @@
                           window.location.hostname === 'localhost' || 
                           window.location.hostname === '127.0.0.1';
 
-      // 6. Carousel State
-      let carouselPhotos = [];
-      let currentPhotoIndex = 0;
-      let carouselInterval = null;
-
-      function renderCarousel(photos) {
-        if (!photos || photos.length === 0) return;
-        carouselPhotos = photos;
-        currentPhotoIndex = 0;
-
-        const imgEl = document.getElementById('carousel-img');
-        const capEl = document.getElementById('carousel-caption');
-        const dotsEl = document.getElementById('carousel-dots');
-
-        dotsEl.innerHTML = '';
-        photos.forEach((_, idx) => {
-          const dot = document.createElement('div');
-          dot.className = 'photo-dot' + (idx === 0 ? ' active' : '');
-          dot.addEventListener('click', () => setPhoto(idx));
-          dotsEl.appendChild(dot);
-        });
-
-        function updateSlide() {
-          const item = carouselPhotos[currentPhotoIndex];
-          imgEl.style.opacity = '0';
-          setTimeout(() => {
-            imgEl.src = item.url;
-            capEl.textContent = item.caption || '';
-            imgEl.style.opacity = '1';
-          }, 150);
-
-          Array.from(dotsEl.children).forEach((dot, idx) => {
-            dot.className = 'photo-dot' + (idx === currentPhotoIndex ? ' active' : '');
-          });
-        }
-
-        function setPhoto(idx) {
-          currentPhotoIndex = idx;
-          updateSlide();
-          resetCarouselTimer();
-        }
-
-        function resetCarouselTimer() {
-          if (carouselInterval) clearInterval(carouselInterval);
-          carouselInterval = setInterval(() => {
-            currentPhotoIndex = (currentPhotoIndex + 1) % carouselPhotos.length;
-            updateSlide();
-          }, 4500);
-        }
-
-        // Tap photo to advance
-        document.getElementById('photo-frame').onclick = () => {
-          currentPhotoIndex = (currentPhotoIndex + 1) % carouselPhotos.length;
-          updateSlide();
-          resetCarouselTimer();
-        };
-
-        updateSlide();
-        resetCarouselTimer();
-      }
-
-      // 7. Render Card Content
+      // 6. Render Card Content
       function renderCardData(data) {
         if (!data) return;
 
-        if (data.badge) document.getElementById('card-badge').textContent = data.badge;
-        if (data.title) document.getElementById('card-title').textContent = data.title;
-        if (data.subtitle) document.getElementById('card-subtitle').textContent = data.subtitle;
-        if (data.greeting) document.getElementById('letter-greeting').textContent = data.greeting;
-        if (data.signature) document.getElementById('card-signature').textContent = data.signature;
-        if (data.date) document.getElementById('card-date').textContent = data.date;
-
-        // Render message paragraphs
-        const letterContainer = document.getElementById('letter-paragraphs');
-        letterContainer.innerHTML = '';
-        if (Array.isArray(data.message)) {
-          data.message.forEach(p => {
-            const el = document.createElement('p');
-            el.className = 'letter-paragraph';
-            el.textContent = p;
-            letterContainer.appendChild(el);
-          });
+        if (data.title) {
+          document.getElementById('card-title').textContent = data.title;
         }
 
-        // Render wishes
-        const wishesContainer = document.getElementById('wishes-container');
-        wishesContainer.innerHTML = '';
-        if (Array.isArray(data.wishes)) {
-          data.wishes.forEach(item => {
-            const chip = document.createElement('div');
-            chip.className = 'wish-chip';
-            const icon = typeof item === 'object' ? item.icon : '✨';
-            const text = typeof item === 'object' ? item.text : item;
-            chip.innerHTML = `<span>${icon}</span> <span>${text}</span>`;
-            wishesContainer.appendChild(chip);
-          });
-        }
-
-        // Render photos
-        if (Array.isArray(data.photos) && data.photos.length > 0) {
-          renderCarousel(data.photos);
+        const messageEl = document.getElementById('card-message');
+        if (messageEl && typeof data.message === 'string') {
+          messageEl.textContent = data.message;
         }
       }
 
