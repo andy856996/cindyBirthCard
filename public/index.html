@@ -841,10 +841,6 @@
          ============================================================= -->
     <section id="view-safari-guide" class="view-section">
       <div class="guide-card">
-        <div class="ios-badge">
-          <span></span> iOS 原生模式體驗
-        </div>
-
         <img src="/icon-512.png" alt="App Icon" class="guide-icon-preview">
 
         <h1 class="guide-title">專屬賀卡 App 已就緒</h1>
@@ -882,10 +878,6 @@
             </div>
           </div>
         </div>
-
-        <button id="dev-bypass-btn" class="dev-bypass-btn">
-          💻 開發者／電腦瀏覽器預覽模式 (點此直接測試)
-        </button>
       </div>
 
       <!-- Bouncing Arrow pointing to iPhone Safari Bottom Bar -->
@@ -1032,21 +1024,6 @@
          ============================================================= -->
     <section id="view-card" class="view-section">
       <div class="card-wrapper">
-
-        <!-- Top Control Bar -->
-        <div class="card-top-bar">
-          <div class="card-top-pill" id="card-badge">
-            ✨ Special Edition · Birthday Card
-          </div>
-          <div class="card-controls">
-            <button id="music-toggle-btn" class="icon-ctrl-btn" title="播放歡慶生日音樂">
-              🎵
-            </button>
-            <button id="confetti-btn" class="icon-ctrl-btn" title="再放一次彩帶">
-              🎉
-            </button>
-          </div>
-        </div>
 
         <!-- Birthday Main Card Body -->
         <article class="birthday-main-card">
@@ -1367,7 +1344,7 @@
       }
 
       // Event listeners for actions
-      document.getElementById('dev-bypass-btn').addEventListener('click', () => {
+      document.getElementById('dev-bypass-btn')?.addEventListener('click', () => {
         const cachedData = localStorage.getItem(STORAGE_KEY);
         if (cachedData) {
           try {
@@ -1380,11 +1357,11 @@
         switchView('login');
       });
 
-      document.getElementById('confetti-btn').addEventListener('click', () => {
+      document.getElementById('confetti-btn')?.addEventListener('click', () => {
         spawnConfetti(90);
       });
 
-      document.getElementById('music-toggle-btn').addEventListener('click', () => {
+      document.getElementById('music-toggle-btn')?.addEventListener('click', () => {
         playBirthdayChime();
       });
 
